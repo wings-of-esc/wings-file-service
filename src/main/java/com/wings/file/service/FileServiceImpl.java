@@ -18,6 +18,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class FileServiceImpl implements FileService {
@@ -42,6 +45,16 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public List<String> retrieveAllFiles() {
+        try{
+           return Files.list(this.fileStorageLocation).filter(Files::isRegularFile)
+                    .map(x -> x.getFileName().toString()).collect(Collectors.toList());
+        } catch (IOException ex) {
+            throw new FileServiceException("exception in retrieve all files", ex);
+        }
+    }
+
+    @Override
     public FileDO upload(String name, MultipartFile file, boolean isProfileImage) {
         String fileName = name + "." + FilenameUtils.getExtension(file.getOriginalFilename());
         try {
@@ -60,9 +73,10 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public Resource download(String fileName) {
+    public Resource download(String fileName, boolean isProfileImage) {
         try {
-            Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
+            Path filePath =
+                    isProfileImage ? this.profileImgStorageLocation.resolve(fileName).normalize() : this.fileStorageLocation.resolve(fileName).normalize();
             Resource resource = new UrlResource(filePath.toUri());
             if(resource.exists()) {
                 return resource;

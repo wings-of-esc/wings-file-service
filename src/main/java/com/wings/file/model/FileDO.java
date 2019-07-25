@@ -1,8 +1,10 @@
 package com.wings.file.model;
 
+import org.springframework.hateoas.Link;
+
 public class FileDO {
     private String fileName;
-    private String filePath;
+    private Link filePath;
 
     public String getFileName() {
         return fileName;
@@ -12,15 +14,15 @@ public class FileDO {
         this.fileName = fileName;
     }
 
-    public String getFilePath() {
+    public Link getFilePath() {
         return filePath;
     }
 
-    public void setFilePath(String filePath) {
+    public void setFilePath(Link filePath) {
         this.filePath = filePath;
     }
 
-    public FileDO(String fileName, String filePath) {
+    public FileDO(String fileName, Link filePath) {
         this.fileName = fileName;
         this.filePath = filePath;
     }

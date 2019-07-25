@@ -10,7 +10,6 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -20,7 +19,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 public class FileServiceImpl implements FileService {
@@ -56,7 +54,9 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public FileDO upload(String name, MultipartFile file, boolean isProfileImage) {
-        String fileName = name + "." + FilenameUtils.getExtension(file.getOriginalFilename());
+        String fileName = FilenameUtils.removeExtension(name)
+                + "." +
+                FilenameUtils.getExtension(file.getOriginalFilename());
         try {
             // Check if the file's name contains invalid characters
             if(fileName.contains("..")) {
@@ -66,7 +66,7 @@ public class FileServiceImpl implements FileService {
             Path targetLocation =
                     isProfileImage ? this.profileImgStorageLocation.resolve(fileName) : this.fileStorageLocation.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-            return new FileDO(fileName, targetLocation.toString());
+            return new FileDO(fileName, null);
         } catch (IOException ex) {
             throw new FileServiceException("Could not store file " + fileName + ". Please try again!", ex);
         }

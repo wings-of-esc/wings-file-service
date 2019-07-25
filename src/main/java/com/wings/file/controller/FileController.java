@@ -4,6 +4,7 @@ import com.wings.file.model.FileDO;
 import com.wings.file.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,12 +54,10 @@ public class FileController {
     }
 
     @PostMapping("/profile-img/{memberId}")
-    public FileDO uploadProfileImage(@PathVariable("memberId") String memberId,
+    public Link uploadProfileImage(@PathVariable("memberId") String memberId,
                                    @RequestParam("file") MultipartFile file) {
         FileDO fileDO = service.upload(memberId, file, true);
-        fileDO.setFilePath(linkTo(methodOn(getClass())
-                .retrieveProfileImage(fileDO.getFileName())).withSelfRel());
-        return fileDO;
+        return linkTo(methodOn(getClass()).retrieveProfileImage(fileDO.getFileName())).withSelfRel();
     }
 
 }
